@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Food Style</title>
+    <!-- Bootstrap -->
+    <link href="customerpages/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="customerpages/css/common.css">
+    <link rel="stylesheet" type="text/css" href="customerpages/css/index.css">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+
+    <link rel="stylesheet" href="../managerpages/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="../managerpages/dist/css/adminlte.min.css">
+    <!--
+    <script src="customerpages/js/jquery-2.1.0.min.js"></script>
+    -->
+    <link rel="stylesheet" href="managerpages/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="managerpages/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="customerpages/css/review.css">
+    <script src="managerpages/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <script src="customerpages/js/cart.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+
+        function generateDiv(obj, restaurantName) {
+            var div_col = $('<div class="col-md-3"></div>');
+            var a = $('<a href=""></a>');
+            a.attr('href', 'http://localhost:8080/customerpages/food_list.html?id=' + obj.id + '&restaurantName='+obj.name);
+            var img = $('<img src="" alt=""/>');
+            img.attr('src', obj.photo);
+
+            img.appendTo(a);
+            var div = $('<div class="has_border"></div>');
+            var h3 = $('<h3></h3>');
+            //alert(restaurantName);
+            if (restaurantName){
+                h3.html(obj.name.replace(restaurantName.toUpperCase(),'<span style="color:red">'+ restaurantName.toUpperCase() +'</span>').replace(restaurantName.toLowerCase(),'<span style="color:red">'+ restaurantName.toLowerCase() +'</span>'));
+            }else {
+                h3.text(obj.name);
+            }
+            var h3_2 = $('<h3></h3>');
+            h3_2.text(obj.description);
+
+            var p_rating = $('<div></div>');
+            p_rating.html(getRating(obj.rating));
+
+            var avgprice = $('<div class="price">Average Price <em>$</em><strong>'+ obj.avgprice +'</strong><em></em></div>');
+            h3.appendTo(div);
+            h3_2.appendTo(div);
+            p_rating.appendTo(div);
+            avgprice.appendTo(div);
+            div.appendTo(a);
+
+
+            a.appendTo(div_col);
+
+            return div_col;
+        }
+
+        function getRating(ratting) {
+            var div = $('<div>\n' +
+                '                        <i class="fa fa-star '+ (ratting >= 1 ? "checked" : "unchecked") +'" ></i>\n' +
+                '                        <i class="fa fa-star '+ (ratting >= 2 ? "checked" : "unchecked") +'" ></i>\n' +
+                '                        <i class="fa fa-star '+ (ratting >= 3 ? "checked" : "unchecked") +'" ></i>\n' +
+                '                        <i class="fa fa-star '+ (ratting >= 4 ? "checked" : "unchecked") +'" ></i>\n' +
+                '                        <i class="fa fa-star '+ (ratting >= 5 ? "checked" : "unchecked") +'" ></i>\n' +
+                '                    </div>');
+            return div;
+        }
+
+        function generateRow() {
+            var row = $(' <div class="row"></div>');
+            return row;
+        }
+        function loadMainData(category){
+            restaurantCategory = category;
+            $.ajax({
+                type: "get",
+                url: "http://localhost:8080/restaurants/category/"+ category,
+                async: true,
+                contentType: 'application/json',
+                dataType: 'JSON',
+                success: function(data) {
+                    var root = $('#popularity');
+                    root.html("");
+                    var row;
+                    var index = 0;
+                    $.each(data, function (i, obj) {
+                        if (i % 4 == 0){
+                            row = generateRow();
+                        }
+                        generateDiv(obj).appendTo(row)
+                        if (i % 3 == 0){
+                            row.appendTo(root);
+                        }
+                        index = i;
+                    });
+                    if(index%3 != 0){
+                        row.appendTo(root);
+                    }
+                }
+            });
+        }
+
+        function searchRestaurant() {
+            var restaurantName = $('#searchValue').val();
+            if (restaurantName.trim() == ''){
+                return;
+            }
+            $.ajax({
+                type: "get",
+                url: "http://localhost:8080/restaurants/"+ restaurantCategory +"/"+ restaurantName,
+                async: true,
+                contentType: 'application/json',
+                dataType: 'JSON',
+                success: function(data) {
+                    var root = $('#popularity');
+                    root.html("");
+                    var row;
+                    var index = 0;
+                    $.each(data, function (i, obj) {
+                        if (i % 4 == 0){
+                            row = generateRow();
+                        }
+                        generateDiv(obj, restaurantName).appendTo(row)
+                        if (i % 3 == 0){
+                            row.appendTo(root);
+                        }
+                        index = i;
+                    });
+                    if(index%3 != 0){
+                        row.appendTo(root);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+
+</head>
+<body onload="loadMainData(1);loadCartList();">
+    <header id="header">
+        <div class="header_wrap">
+            <div class="topbar" style="z-index: 99999;">
+                <div class="logo">
+                    <a href="/"><img src="customerpages/images/logo.png" height="70px" width="70px"></a>
+                </div>
+                <div class="search">
+                    <input id="searchValue" name="" type="text" placeholder="please input the name of restaurant" class="search_input" autocomplete="off">
+                    <a href="javascript: void(0);" class="search-button" onclick="searchRestaurant()">Search</a>
+                </div>
+				<div class="shortcut">
+                    <div>
+                        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+                            <!-- Right navbar links -->
+                            <ul class="navbar-nav ml-auto">
+                                <!-- Shopping Cart Dropdown Menu -->
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link" data-toggle="dropdown" href="#">
+                                        <i class="fa fa-shopping-cart"></i>
+                                        <span id="foodCount" class="badge badge-danger navbar-badge">0</span>
+                                    </a>
+
+                                    <div id="cart_list" class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+
+                                    </div>
+                                </li>
+                                <!-- Shopping Cart Dropdown Menu -->
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <div id="logoutDiv" class="login_out">
+                        <a href="customerpages/login.html">login</a>
+                        <a href="customerpages/register.html">register</a>
+                    </div>
+
+                    <div id="loginDiv" class="login">
+                        <span id="loginContent">Welcome back</span>
+                        <span>----</span>
+                        <a href="javascript:;" onclick="logOut()">Log Out</a>
+                    </div>
+                    <script type="text/javascript">
+                        const username = window.localStorage.getItem('username');
+                        if (username == ''){
+                            document.getElementById('loginDiv').style.display = 'none';
+                        }else {
+                            document.getElementById('logoutDiv').style.display = 'none';
+                            document.getElementById('loginContent').innerText = "Welcome back，" + username;
+                        }
+
+                        function logOut() {
+                            window.localStorage.setItem('userid', '');
+                            window.localStorage.setItem('username', '');
+                            window.location = "http://localhost:8080/";
+                        }
+                    </script>
+				</div>
+            </div>
+        </div>
+    </header>
+    <!-- banner start-->
+    <section id="banner">
+        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="2000">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+            </ol>
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox">
+                <div class="item active">
+                    <img src="customerpages/images/banner_1.jpg" alt="">
+                </div>
+                <div class="item">
+                    <img src="customerpages/images/banner_2.jpg" alt="">
+                </div>
+                <div class="item">
+                    <img src="customerpages/images/banner_3.jpg" alt="">
+                </div>
+            </div>
+            <!-- Controls -->
+            <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+			    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+			    <span class="sr-only">Previous</span>
+			  </a>
+            <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+			    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+			    <span class="sr-only">Next</span>
+			  </a>
+        </div>
+    </section>
+    <!-- banner end-->
+    <section id="content">
+         <!-- start-->
+        <section class="hemai_jx">
+            <div class="jx_top">
+                <div class="jx_tit">
+                    <img src="customerpages/images/icon_5.jpg" alt="">
+                    <span>Category</span>
+                </div>
+                <!-- Nav tabs -->
+                <ul class="jx_tabs" role="tablist">
+                    <li class="active" role="presentation">
+                        <span></span>
+                        <a href="#Ameriacan" onclick="loadMainData(1)" aria-controls="Ameriacan" role="tab" data-toggle="tab">Ameriacan Reataurant</a>
+                    </li>
+                    <li role="presentation">
+                        <span></span>
+                        <a href="#Chinese" onclick="loadMainData(2)" aria-controls="Chinese" role="tab" data-toggle="tab">Chinese Restaurant</a>
+                    </li>
+				
+                    <li role="presentation">
+                        <span></span>
+                        <a href="#Indian" onclick="loadMainData(3)" aria-controls="Indian" role="tab" data-toggle="tab">Indian Restaurant</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="jx_content">
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="popularity">
+
+					</div>
+                </div>
+            </div>
+        </section>
+    </section>
+    
+    <footer id="footer">
+        <div class="why_select">
+            <dl>
+                <dt class="fl">
+                    <img src="customerpages/images/icon_1.jpg" alt="">
+                </dt>
+                <dd>
+                    <h1>FoodStyle</h1>
+                    <h2>www.foodstyle.com</h2>
+                </dd>
+            </dl>
+            <dl>
+                <dt class="fl">
+                    <img src="customerpages/images/icon_2.jpg" alt="">
+                </dt>
+                <dd>
+                    <h1>FoodStyle</h1>
+                    <h2>www.foodstyle.com</h2>
+                </dd>
+            </dl>
+            <dl>
+                <dt class="fl">
+                    <img src="customerpages/images/icon_3.jpg" alt="">
+                </dt>
+                <dd>
+                    <h1>FoodStyle</h1>
+                    <h2>www.foodstyle.com</h2>
+                </dd>
+            </dl>
+
+            <dl>
+                <dt class="fl">
+                    <img src="customerpages/images/icon_4.jpg" alt="">
+                </dt>
+                <dd style="margin-right:0px;">
+                    <h1>FoodStyle</h1>
+                    <h2>www.foodstyle.com</h2>
+                </dd>
+            </dl>
+			
+        </div>
+    </footer>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+
+    <script src="customerpages/js/jquery-2.1.0.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="customerpages/js/bootstrap.min.js"></script>
+    
+</body>
+</html>

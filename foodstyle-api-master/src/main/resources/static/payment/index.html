@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title data-i18n="title"></title>
+    <meta name="description" content="A demo of Stripe Payment Intents" />
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/global.css" />
+    <!-- Load Stripe.js on your website. -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="http://localhost:8082/flagdream/client/script.js" defer></script>
+    <!-- Load translation files and libraries. -->
+    <script src="https://unpkg.com/i18next/i18next.js"></script>
+    <script src="https://unpkg.com/i18next-xhr-backend/i18nextXHRBackend.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.js"></script>
+    <script src="http://localhost:8082/flagdream/client/translation.js" defer></script>
+  </head>
+
+  <body>
+  token :<input type="text" id="token" width="10"/>
+  <br>
+  coupon :<input type="number" id="coupon" width="10"/>
+  <br>
+  courseId1 :<input type="number" id="courseId1" width="10"/>
+  quantity1 :<input type="number" id="quantity1" width="10"/>
+  <br>
+  courseId2 :<input type="number" id="courseId2" width="10"/>
+  quantity2 :<input type="number" id="quantity2" width="10"/>
+  <br>
+  SessionID :<input type="text" id="sessionId" width="10"/>
+  <br>
+    <div class="sr-root">
+      <div class="sr-main">
+        <header class="sr-header">
+          <div class="sr-header__logo"></div>
+        </header>
+        <section class="container">
+          <div>
+            <h1 data-i18n="headline"></h1>
+            <h4 data-i18n="subline"></h4>
+            <div class="pasha-image">
+              <img
+                src="https://picsum.photos/280/320?random=4"
+                width="140"
+                height="160"
+              />
+            </div>
+          </div>
+          <div class="quantity-setter">
+            <button class="increment-btn" id="subtract" disabled>
+              -
+            </button>
+            <input type="number" id="quantity-input" min="1" value="1" />
+            <button class="increment-btn" id="add">+</button>
+          </div>
+          <p class="sr-legal-text" data-i18n="sr-legal-text"></p>
+
+          <button
+            id="submit"
+            data-i18n="button.submit"
+            i18n-options='{ "total": "10" }'
+          ></button>
+        </section>
+        <div id="error-message"></div>
+      </div>
+    </div>
+  </body>
+</html>

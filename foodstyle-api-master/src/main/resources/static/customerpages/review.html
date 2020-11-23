@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Review</title>
+        <!-- star symbol:  -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="css/review.css">
+        <link rel="stylesheet" href="../managerpages/dist/css/adminlte.min.css">
+        <script src="js/jquery-2.1.0.min.js"></script>
+
+        <script type="text/javascript">
+            function submitForm(){
+                var fields = $('#rateRestaurant').serializeArray();
+                var obj = {};
+                obj.restaurantid = restId;
+                obj.userid = window.localStorage.getItem('userid');
+                obj.username = window.localStorage.getItem('username');
+                $.each(fields, function(index, field) {
+                    obj[field.name] = field.value;
+                });
+                // Add restaurant name
+                let rest_name = document.getElementById('rest_name').innerText
+                obj['restaurantname'] = rest_name
+                // set score to nothing if null 
+                if (obj['rating'] === '-'){ obj['rating'] = ''}
+
+                console.log(rest_name)
+                console.log(fields)
+                console.log(obj)
+                $.ajax({
+                    type: "post",
+                    url: "http://localhost:8080/post-review",
+                    async: true,
+                    contentType: 'application/json',
+                    dataType: 'JSON',
+                    data: JSON.stringify(obj),
+                    success: function(data) {
+                        loadReviewData();
+                        alert("Rating succeeded!");
+                    }
+                });
+            }
+        </script>
+    </head>
+    <body onload="loadReviewData()" style="height: 100%;">
+        <div class="card direct-chat direct-chat-warning" style="height: 100%">
+            <div class="card-header">
+                <h3 id="rest_name" class="card-title"></h3>
+
+                <div class="card-tools">
+                    <span id="commentCount" data-toggle="tooltip" class="badge badge-warning">0</span> comments
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body" style="height: 400px;">
+                <div id="reviewList" class="direct-chat-messages" style="height: 100%">
+
+                </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                <form id="rateRestaurant" action="" method="post">
+                    <div class="rating">
+                        <i class="fa fa-star unchecked" id="one" value=1></i>
+                        <i class="fa fa-star unchecked" id="two" value=2></i>
+                        <i class="fa fa-star unchecked" id="three" value=3></i>
+                        <i class="fa fa-star unchecked" id="four" value=4></i>
+                        <i class="fa fa-star unchecked" id="five" value=5></i>
+                        <input id="ratingScore" name="rating" value='-' readonly></input>
+                    </div>
+                    <script src='js/review.js'></script>
+
+                    <div class="input-group">
+                        <!--
+                        <input type="text" name="review" placeholder="Write about your experience here =)" class="form-control">
+                        -->
+                        <textarea class="form-control" rows="6" name='review'
+                                  placeholder="Write about your experience here =)"></textarea>
+                        <span class="input-group-append">
+                     <button type="button" class="btn btn-warning" onclick="submitForm()">Rate</button>
+                   </span>
+                    </div>
+                </form>
+            </div>
+            <!-- /.card-footer-->
+        </div>
+        <div class="container" style="display: none;">
+            <div class='rest_name' ></div>
+            <form  action="">
+
+                <textarea class="review_box" name='review'
+                          placeholder="Write about your experience here =)"></textarea>
+                <input type="button" class="submit" onclick="submitForm()" value="rate">
+            </form>
+        </div>
+        <div class='msg_section' style="display: none;">
+            <p>Thank You for your <br> purchase!</p>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="EN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Add New Manager</title>
+
+    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script src="dist/js/jquery-2.1.0.min.js"></script>
+    
+    <script src="dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        function submitForm(){
+            var fields = $('#form').serializeArray();
+            var obj = {};
+            $.each(fields, function(index, field) {
+                obj[field.name] = field.value;
+            });
+            $.ajax({
+                type: "post",
+                url: "http://localhost:8080/managers",
+                async: true,
+                contentType: 'application/json',
+                dataType: 'JSON',
+                data: JSON.stringify(obj),
+                success: function(data) {
+                    alert("Created successfully!");
+                    location.href = "http://localhost:8080/managerpages/manager_list_content.html"
+                }
+            });
+        }
+        function loadRestaurant() {
+            $.ajax({
+                type: "get",
+                url: "http://localhost:8080/restaurants",
+                async: true,
+                contentType: 'application/json',
+                dataType: 'JSON',
+                success: function(data) {
+                    var restaurant = $('#restaurant');
+                    $.each(data, function (i, obj) {
+                        var option = $('<option value=""></option>');
+                        option.attr('value', obj.id);
+                        option.text(obj.name);
+                        option.appendTo(restaurant);
+                    })
+                }
+            });
+        }
+    </script>
+</head>
+<body onload="loadRestaurant()">
+<div class="container">
+    <center><h3>Add New Manager</h3></center>
+    <form id="form" action="" method="post">
+        <div class="form-group">
+            <label for="firstname">First Name：</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Please input your first name">
+        </div>
+
+        <div class="form-group">
+            <label for="lastname">Last Name：</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Please input your last name">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone：</label>
+            <input type="text" class="form-control" id="phone" name="phone" placeholder="Please input your phone number">
+        </div>
+
+        <div class="form-group">
+            <label for="address">Address：</label>
+            <input type="text" class="form-control" id="address" name="address" placeholder="Please input your address"/>
+        </div>
+		
+		<div class="form-group">
+		    <label for="photo">Photo：</label>
+		    <input type="text" class="form-control" id="photo" name="photo" placeholder="Please input your photo link"/>
+		</div>
+
+        <div class="form-group">
+            <label for="email">Email：</label>
+            <input type="text" class="form-control" id="email" name="email" placeholder="Please input your email"/>
+        </div>
+		<div class="form-group">
+		    <label for="password">Password：</label>
+		    <input type="password" class="form-control" id="password" name="password" placeholder="Please input the password"/>
+		</div>
+		<div class="form-group">
+		    <label for="restaurant">Restaurant：</label>
+            <select name="restaurantid" class="form-control" id="restaurant">
+                <option value="">Please select the restaurant</option>
+            </select>
+		</div>
+
+        <div class="form-group" style="text-align: center">
+            <input class="btn btn-primary" type="button" value="Summit" onclick="submitForm()"/>
+            <input class="btn btn-default" type="reset" value="Reset" />
+        </div>
+    </form>
+</div>
+</body>
+</html>
